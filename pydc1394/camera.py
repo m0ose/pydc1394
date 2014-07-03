@@ -24,7 +24,7 @@
 from _dc1394core import *
 from _dc1394core import _dll
 from ctypes import *
-
+import time
 
 from numpy import fromstring, ndarray
 from threading import *
@@ -57,6 +57,7 @@ class DC1394Library(object):
         # we cache the dll, so it gets not deleted before we cleanup
         self._dll = _dll
         self._h = _dll.dc1394_new()
+        print("USING ALTERED VERSION OF PYDC1394. FROM M0OSE")
 
     def __del__(self):
         self.close()
@@ -217,9 +218,20 @@ class _CamAcquisitonThread(Thread):
 
             self._condition.acquire()
             #generate an Image class from the buffer:
-            img = fromstring(buf, dtype=self._cam.mode.dtype).reshape(
-                self._cam.mode.shape
-            ).view(Image)
+            
+            #img = fromstring(buf, dtype=self._cam.mode.dtype).reshape(
+            #    self._cam.mode.shape
+            #).view(Image)
+
+            # this keeps it from throwing weird errors
+            for i in range(20):
+                try:
+                    img = fromstring(buf, dtype=self._cam.mode.dtype).reshape(
+                        self._cam.mode.shape
+                    ).view(Image)
+                    break 
+                except:
+                    time.sleep(0.1)   
 
             img._position, img._packet_size, img._packets_per_frame, \
                 img._timestamp, img._frames_behind, img._id = \
