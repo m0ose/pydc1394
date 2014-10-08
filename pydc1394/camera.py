@@ -33,6 +33,8 @@ from Queue import Queue, Full
 
 from _mode import _mode_map, create_mode
 
+import brightestPoint 
+
 
 __all__ = ["DC1394Library", "Camera", "SynchronizedCams",
            "DC1394Error", "CameraError"]
@@ -240,10 +242,15 @@ class _CamAcquisitonThread(Thread):
                 frame.contents.frames_behind,frame.contents.id
             self._cam._current_img = img
 
+            #find the brightestP point in the image
+            if self._cam._get_brightest == True:
+                self._cam._brightest_point = brightestPoint.brightestPoint(img)
+
             #is the camera streaming to a queue?
             if self._cam._queue:
                 # Will throw an exception if you're to slow while processing
                 self._cam._queue.put_nowait(img)
+
 
             self._condition.notifyAll()
             self._condition.release()
@@ -582,6 +589,8 @@ class Camera(object):
         self._new_image = Condition()
         self._current_img = None
         self._worker = None
+        self._get_brightest = True
+        self._brightest_point = None
 
         self.open()
 
