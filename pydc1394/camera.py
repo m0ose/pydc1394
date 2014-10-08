@@ -590,7 +590,7 @@ class Camera(object):
         self._current_img = None
         self._worker = None
         self._get_brightest = True
-        self._brightest_point = None
+        self._brightest_point = {"x":"0", "y":"0", "x1":"0", "y1":"0", "i":"0"}
 
         self.open()
 
@@ -1052,6 +1052,11 @@ class Camera(object):
         """Return all features of this camera. You can use __getattr__ to
         directly access them then."""
         return self._all_features
+
+    def getBrightest( self):
+        """ Should this be thread safe.
+        """
+        return self._brightest_point
 
 
 class SynchronizedCams(object):
